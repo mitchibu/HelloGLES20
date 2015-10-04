@@ -95,6 +95,8 @@ public class MainRenderer implements GLSurfaceView.Renderer {
 	private int mRenderbufferName;
 	private int mTexName;
 
+	private long tick;
+
 	public MainRenderer(MainActivity activity) {
 		this.activity = activity;
 	}
@@ -114,7 +116,7 @@ public class MainRenderer implements GLSurfaceView.Renderer {
 			final int[] args = new int[1];
 			GLES20.glGenBuffers(args.length, args, 0);
 			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, args[0]);
-			GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, fboBuffer.capacity() * FLOAT_SIZE_BYTES, spriteBuffer, GLES20.GL_STATIC_DRAW);
+			GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, spriteBuffer.capacity() * FLOAT_SIZE_BYTES, spriteBuffer, GLES20.GL_STATIC_DRAW);
 			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 			mSpriteBufferName = args[0];
 		}
@@ -299,6 +301,23 @@ public class MainRenderer implements GLSurfaceView.Renderer {
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 		GLES20.glDisable(GLES20.GL_TEXTURE_2D);
 		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+		long now = System.currentTimeMillis();
+		if(tick != 0) {
+			long diff = now - tick;
+			// 30fps 1/30spf f:1000/30ms
+			float m = 1000.0f / 30.0f;
+			long ms = (long)(m - diff);
+			android.util.Log.v("test", "ms: " + ms);
+			if(ms > 0) {
+				try {
+					Thread.sleep(ms);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		tick = now;
  	}
 
 	static class Sprite {
